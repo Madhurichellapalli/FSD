@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive To-Do List</title>
+  <link rel="stylesheet" href="todorefer.css">
+</head>
+<body>
+  <h1><u>To-Do List</u></h1>
+  
+  <div class="task-input">
+    <input type="text" id="taskInput" placeholder="What will you do?">
+    <button id="addTaskBtn">Add Task</button>
+  </div>
+  
+  <div class="error-message" id="errorMessage"></div>
+  
+  <ul class="task-list" id="taskList"></ul>
+  
+  <script>
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const taskList = document.getElementById('taskList');
+    let tasks = [];
+    
+    function addTask() {
+      const taskText = taskInput.value.trim();
+      
+      if (taskText === '') {
+        showError('Please enter your task.');
+        return;
+      }
+      
+      const task = { id: Date.now(), text: taskText };
+      tasks.push(task);
+      renderTasks();
+      taskInput.value = '';
+      errorMessage.textContent = '';
+    }
+    
+    function editTask(taskId) {
+      const taskElement = document.getElementById(`task_${taskId}`);
+      const taskInput = taskElement.querySelector('input[type="text"]');
+      const taskText = taskInput.value.trim();
+      
+      if (taskText === '') {
+        showError('Please enter a task.');
+        return;
+      }
+      
+      const task = tasks.find(task => task.id === taskId);
+      task.text = taskText;
+      renderTasks();
+    }
+    
+    function deleteTask(taskId) {
+      tasks = tasks.filter(task => task.id !== taskId);
+      renderTasks();
+    }
+    
+    function showError(message) {
+      errorMessage.textContent = message;
+    }
+    
+    function renderTasks() {
+      taskList.innerHTML = '';
+      
+      tasks.forEach(task => {
+        const taskElement = document.createElement('li');
+        taskElement.classList.add('task-item');
+        taskElement.id = `task_${task.id}`;
+        
+        const taskInput = document.createElement('input');
+        taskInput.type = 'text';
+        taskInput.value = task.text;
+        
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => editTask(task.id));
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => deleteTask(task.id));
+        
+        taskElement.appendChild(taskInput);
+        taskElement.appendChild(editButton);
+        taskElement.appendChild(deleteButton);
+        taskList.appendChild(taskElement);
+      });
+    }
+    
+    addTaskBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', event => {
+      if (event.key === 'Enter') {
+        addTask();
+      }
+    });
+  </script>
+</body>
+</html>
+
